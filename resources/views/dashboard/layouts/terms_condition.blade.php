@@ -1,5 +1,5 @@
 <div class="terms-content">
-    <h5 class="mb-3">Syarat dan Ketentuan Pengajuan Reset Password</h5>
+    <h5 class="mb-3">Syarat dan Ketentuan Layanan</h5>
     
     <div class="terms-section">
         <h6>Otorisasi:</h6>

@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <style>
     .is-invalid {
@@ -25,7 +26,7 @@
 
 <div class="col-lg-7">
     <form method="post" action="/dashboard/passphrase/store"
-    enctype="multipart/form-data" class="mb-5">
+    enctype="multipart/form-data" class="mb-5" id="passphraseForm">
         @csrf
 
          <div class="mb-3">
@@ -168,127 +169,137 @@
         </div>
 
         <script>
-            $(document).ready(function() {
-                // Validasi untuk Nama
-                $('#nama').on('input', function() {
-                    const validIcon = $('#valid-nama');
-                    const regex = /^[\p{L} ]+$/u; // Hanya huruf dan spasi
-                    const value = $(this).val();
-            
-                    if (value.length > 0 && value.length <= 255 && regex.test(value)) {
-                        validIcon.show(); // Tampilkan centang hijau
-                        $(this).removeClass('is-invalid'); // Hapus kelas invalid
-                    } else {
-                        validIcon.hide(); // Sembunyikan centang hijau
-                        $(this).addClass('is-invalid'); // Tambahkan kelas invalid
-                    }
-                });
+$(document).ready(function() {
+    // Validasi untuk Nama
+    $('#nama').on('input', function() {
+        const validIcon = $('#valid-nama');
+        const regex = /^[\p{L} ]+$/u; // Hanya huruf dan spasi
+        const value = $(this).val();
+        
+        if (value.length > 0 && value.length <= 255 && regex.test(value)) {
+            validIcon.show(); // Tampilkan centang hijau
+            $(this).removeClass('is-invalid'); // Hapus kelas invalid
+        } else {
+            validIcon.hide(); // Sembunyikan centang hijau
+            $(this).addClass('is-invalid'); // Tambahkan kelas invalid
+        }
+    });
 
-                // Validasi untuk NIP Pemohon
-                $('#nip_pemohon').on('input', function() {
-                    const validIcon = $('#valid-nip_pemohon');
-                    const value = $(this).val();
-            
-                    if (/^\d{18}$/.test(value)) { // Cek panjang dan format
-                        validIcon.show(); // Tampilkan centang hijau
-                        $(this).removeClass('is-invalid'); // Hapus kelas invalid
-                    } else {
-                        validIcon.hide(); // Sembunyikan centang hijau
-                        $(this).addClass('is-invalid'); // Tambahkan kelas invalid
-                    }
-                });
-            
-                // Validasi untuk Nomor Telepon
-                $('#no_telp').on('input', function() {
-                    const validIcon = $('#valid-no_telp');
-                    const value = $(this).val();
-            
-                    if (/^\d{10,15}$/.test(value)) { // Cek panjang dan format
-                        validIcon.show(); // Tampilkan centang hijau
-                        $(this).removeClass('is-invalid'); // Hapus kelas invalid
-                    } else {
-                        validIcon.hide(); // Sembunyikan centang hijau
-                        $(this).addClass('is-invalid'); // Tambahkan kelas invalid
-                    }
-                });
-            
-                // Validasi untuk Nama user
-                $('#nama_user').on('input', function() {
-                    const validIcon = $('#valid-nama_user');
-                    const value = $(this).val();
-            
-                    if (value.length > 0 && value.length <= 255) {
-                        validIcon.show(); // Tampilkan centang hijau
-                        $(this).removeClass('is-invalid'); // Hapus kelas invalid
-                    } else {
-                        validIcon.hide(); // Sembunyikan centang hijau
-                        $(this).addClass('is-invalid'); // Tambahkan kelas invalid
-                    }
-                });
+    // Validasi untuk NIP Pemohon
+    $('#nip_pemohon').on('input', function() {
+        const validIcon = $('#valid-nip_pemohon');
+        const value = $(this).val();
+        
+        if (/^\d{18}$/.test(value)) { // Cek panjang dan format
+            validIcon.show(); // Tampilkan centang hijau
+            $(this).removeClass('is-invalid'); // Hapus kelas invalid
+        } else {
+            validIcon.hide(); // Sembunyikan centang hijau
+            $(this).addClass('is-invalid'); // Tambahkan kelas invalid
+        }
+    });
 
-                //Validasi untuk nip user
-                $('#nip_user').on('input', function() {
-                    const validIcon = $('#valid-nip_user');
-                    const value = $(this).val();
-            
-                    if (/^\d{18}$/.test(value)) { // Cek panjang dan format
-                        validIcon.show(); // Tampilkan centang hijau
-                        $(this).removeClass('is-invalid'); // Hapus kelas invalid
-                    } else {
-                        validIcon.hide(); // Sembunyikan centang hijau
-                        $(this).addClass('is-invalid'); // Tambahkan kelas invalid
-                    }
-                });
+    // Validasi untuk Nomor Telepon
+    $('#no_telp').on('input', function() {
+        const validIcon = $('#valid-no_telp');
+        const value = $(this).val();
+        
+        if (/^\d{10,15}$/.test(value)) { // Cek panjang dan format
+            validIcon.show(); // Tampilkan centang hijau
+            $(this).removeClass('is-invalid'); // Hapus kelas invalid
+        } else {
+            validIcon.hide(); // Sembunyikan centang hijau
+            $(this).addClass('is-invalid'); // Tambahkan kelas invalid
+        }
+    });
 
-                // Validasi untuk NIK User
-                $('#nik_user').on('input', function() {
-                        const validIcon = $('#valid-nik_user');
-                        const value = $(this).val();
-                
-                        if (/^\d{16}$/.test(value)) { // Cek panjang dan format
-                            validIcon.show(); // Tampilkan centang hijau
-                            $(this).removeClass('is-invalid'); // Hapus kelas invalid
-                        } else {
-                            validIcon.hide(); // Sembunyikan centang hijau
-                            $(this).addClass('is-invalid'); // Tambahkan kelas invalid
-                        }
-                    });
+    // Validasi untuk Nama user
+    $('#nama_user').on('input', function() {
+        const validIcon = $('#valid-nama_user');
+        const regex = /^[\p{L} ]+$/u; // Hanya huruf dan spasi
+        const value = $(this).val();
+        
+        if (value.length > 0 && value.length <= 255 && regex.test(value)) {
+            validIcon.show(); // Tampilkan centang hijau
+            $(this).removeClass('is-invalid'); // Hapus kelas invalid
+        } else {
+            validIcon.hide(); // Sembunyikan centang hijau
+            $(this).addClass('is-invalid'); // Tambahkan kelas invalid
+        }
+    });
 
-                // Validasi untuk Email Domain
-                $('#email_domain').on('input', function() {
-                    const validIcon = $('#valid-email_domain');
-                    const value = $(this).val();
+    //Validasi untuk nip user
+    $('#nip_user').on('input', function() {
+        const validIcon = $('#valid-nip_user');
+        const value = $(this).val();
+        
+        if (/^\d{18}$/.test(value)) { // Cek panjang dan format
+            validIcon.show(); // Tampilkan centang hijau
+            $(this).removeClass('is-invalid'); // Hapus kelas invalid
+        } else {
+            validIcon.hide(); // Sembunyikan centang hijau
+            $(this).addClass('is-invalid'); // Tambahkan kelas invalid
+        }
+    });
 
-                    if (value.length > 0 && /^[^\s@]+@semarangkota\.go\.id+$/.test(value)) { // Cek format email
-                        validIcon.show(); // Tampilkan centang hijau
-                        $(this).removeClass('is-invalid'); // Hapus kelas invalid
-                    } else {
-                        validIcon.hide(); // Sembunyikan centang hijau
-                        $(this).addClass('is-invalid'); // Tambahkan kelas invalid
-                     }
-                });
-                
-            });
+    // Validasi untuk NIK User
+    $('#nik_user').on('input', function() {
+        const validIcon = $('#valid-nik_user');
+        const value = $(this).val();
+        
+        if (/^\d{16}$/.test(value)) { // Cek panjang dan format
+            validIcon.show(); // Tampilkan centang hijau
+            $(this).removeClass('is-invalid'); // Hapus kelas invalid
+        } else {
+            validIcon.hide(); // Sembunyikan centang hijau
+            $(this).addClass('is-invalid'); // Tambahkan kelas invalid
+        }
+    });
 
-                // Validasi untuk Alasan
-                $('#alasan').on('input', function() {
-                    const validIcon = $('#valid-alasan');
-                    const value = $(this).val();
+    // Validasi untuk Email Domain
+    $('#email_domain').on('input', function() {
+        const validIcon = $('#valid-email_domain');
+        const value = $(this).val();
 
-                    if (value.length > 0) {
-                        validIcon.show(); // Tampilkan centang hijau
-                        $(this).removeClass('is-invalid'); // Hapus kelas invalid
-                    } else {
-                        validIcon.hide(); // Sembunyikan centang hijau
-                        $(this).addClass('is-invalid'); // Tambahkan kelas invalid
-                    }
-                });
+        if (value.length > 0 && /^[^\s@]+@semarangkota\.go\.id+$/.test(value)) { // Cek format email
+            validIcon.show(); // Tampilkan centang hijau
+            $(this).removeClass('is-invalid'); // Hapus kelas invalid
+        } else {
+            validIcon.hide(); // Sembunyikan centang hijau
+            $(this).addClass('is-invalid'); // Tambahkan kelas invalid
+        }
+    });
+    
+    // Validasi untuk Alasan
+    $('#alasan').on('input', function() {
+        const validIcon = $('#valid-alasan');
+        const value = $(this).val();
 
+        if (value.length > 0) {
+            validIcon.show(); // Tampilkan centang hijau
+            $(this).removeClass('is-invalid'); // Hapus kelas invalid
+        } else {
+            validIcon.hide(); // Sembunyikan centang hijau
+            $(this).addClass('is-invalid'); // Tambahkan kelas invalid
+        }
+    });
+    
+    // Prevent form from submitting directly
+    $('#passphraseForm').on('submit', function(e) {
+        e.preventDefault();
+        $('#confirmModal').modal('show');
+    });
 
-        </script>
+    // Handle confirmation
+    $('#confirmSubmit').on('click', function() {
+        $('#confirmModal').modal('hide');
+        $('#passphraseForm')[0].submit();
+    }); 
+});
+</script>
 
         <!-- Terms and Conditions Section -->
-        <div class="mb-3">
+        <!-- <div class="mb-3">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="termsCheckbox" required>
                 <label class="form-check-label" for="termsCheckbox">
@@ -296,14 +307,41 @@
                     <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Syarat dan Ketentuan</a>
                 </label>
             </div>
-        </div>
+        </div> -->
 
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
+    <!-- Confirmation Modal with Terms and Conditions -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Konfirmasi Pengajuan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="fw-bold">Apakah Anda yakin ingin mengajukan permohonan ini?</p>
+                    
+                    <div class="mt-3">
+                        <h6>Syarat dan Ketentuan</h6>
+                        <div style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px;">
+                            <!-- Isi terms and conditions -->
+                            @include('dashboard.layouts.terms_condition')
+                        </div>
+                        <!-- <p class="mt-2 text-muted small">Dengan menekan tombol "Ya, Ajukan", Anda menyetujui syarat dan ketentuan di atas.</p> -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" id="confirmSubmit">Ya, Ajukan</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Terms and Conditions Modal -->
-<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -349,5 +387,5 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush
+@endpush -->
 @endsection

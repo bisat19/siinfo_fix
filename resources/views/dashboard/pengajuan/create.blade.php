@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <style>
     .is-invalid {
@@ -24,7 +25,7 @@
 </div>
 
 <div class="col-lg-7">
-    <form method="post" action="/dashboard/pengajuan/store" class="mb-5">
+    <form method="post" action="/dashboard/pengajuan/store" class="mb-5" id="pengajuanForm">
         @csrf
 
         <div class="mb-3">
@@ -47,7 +48,7 @@
         <div class="mb-3">
             <label for="nip" class="form-label @error('nip') is-invalid @enderror">NIP
                 <small class="form-text text-muted d-block">
-                    (Tanpa spasi, tanpa tanda baca, misal 198709032018021002)
+                    Contoh: 198709032018021002
                 </small>
             </label>
             <div class="d-flex align-items-center">
@@ -97,7 +98,7 @@
             <label for="no_telp" class="form-label @error('no_telp') is-invalid @enderror">
                 Nomor Telepon
                 <small class="form-text text-muted d-block">
-                    Contoh : 0818824864
+                    Contoh: 0818824864
                 </small> 
             </label>
             <div class="d-flex align-items-center">
@@ -149,69 +150,116 @@
 
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
+    <!-- Confirmation Modal with Terms and Conditions -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Konfirmasi Pengajuan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="fw-bold">Apakah Anda yakin ingin mengajukan permohonan ini?</p>
+                    
+                    <div class="mt-3">
+                        <h6>Syarat dan Ketentuan</h6>
+                        <div style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px;">
+                            <!-- Isi terms and conditions -->
+                            @include('dashboard.layouts.terms_condition')
+                        </div>
+                        <!-- <p class="mt-2 text-muted small">Dengan menekan tombol "Ya, Ajukan", Anda menyetujui syarat dan ketentuan di atas.</p> -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" id="confirmSubmit">Ya, Ajukan</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
 $(document).ready(function() {
     // Validasi nama -> hanya huruf kapital dan maksimal 20 karakter
     $('#nama').on('input', function() {
-        const input = $(this);
         const validIcon = $('#valid-nama');
-        const regex = /^[A-Z\s]+$/; // Hanya huruf kapital dan spasi
-
-        // Memeriksa panjang input dan regex
-        if (input.val().length <= 20 && regex.test(input.val())) {
+        const value = $(this).val();
+        const regex = /^[\p{L} ]+$/u; // Hanya huruf dan spasi
+        
+        // Remove any non-letter characters (except spaces)
+        if (!regex.test(value)) {
+            $(this).val(value.replace(/[^A-Za-z\s]/g, '').substring(0, 20));
+        }
+        
+        // Check length and regex
+        if (value.length > 0 && value.length <= 20 && regex.test(value)) {
             validIcon.show();
-            input.removeClass('is-invalid');
+            $(this).removeClass('is-invalid');
         } else {
             validIcon.hide();
-            input.addClass('is-invalid');
+            $(this).addClass('is-invalid');
         }
-        });
+    });
     });
 
     // validasi nip
     $('#nip').on('input', function() {
-        const input = $(this);
+        const value = $(this).val();
         const validIcon = $('#valid-nip');
-        const regex = /^\d{18}$/; // Format NIP 18 digit
+        const regex = /^\d{0,18}$/; // Format NIP 18 digit
 
-        if (input.val().length > 0 && regex.test(input.val())) {
+        // allow only numbers and when it comes to char, it will disseapear
+        if (!regex.test(value)) {
+            $(this).val(value.replace(/[^\d]/g, '').substring(0, 18));
+        }
+
+        if (/^\d{18}$/.test(value)) {
             validIcon.show();
-            input.removeClass('is-invalid');
+            $(this).removeClass('is-invalid');
         } else {
             validIcon.hide();
-            input.addClass('is-invalid');
+            $(this).addClass('is-invalid');
         }
     });
 
     // validasi nik
     $('#nik').on('input', function() {
-        const input = $(this);
+        const value = $(this).val();
         const validIcon = $('#valid-nik');
-        const regex = /^\d{16}$/;
+        const regex = /^\d{0,16}$/;
 
-        if (input.val().length > 0 && regex.test(input.val())) {
+        // allow only numbers and when it comes to char, it will disseapear
+        if (!regex.test(value)) {
+            $(this).val(value.replace(/[^\d]/g, '').substring(0, 18));
+        }
+
+        if (/^\d{16}$/.test(value)) {
             validIcon.show();
-            input.removeClass('is-invalid');
+            $(this).removeClass('is-invalid');
         } else {
             validIcon.hide();
-            input.addClass('is-invalid');
+            $(this).addClass('is-invalid');
         }
     });
 
     // validasi nama opd
     $('#nama_opd').on('input', function() {
-        const input = $(this);
+        const value = $(this).val();
         const validIcon = $('#valid-nama_opd');
-        const regex = /^[a-zA-Z\s]+$/;
+        const regex = /^[\p{L} ]+$/u;
 
-        if (input.val().length > 0 && regex.test(input.val())) {
+        // Remove any non-letter characters (except spaces)
+        if (!regex.test(value)) {
+            $(this).val(value.replace(/[^A-Za-z\s]/g, ''));
+        }
+
+        if (value.length > 0 && value.length <= 255 && regex.test(value)) {
             validIcon.show();
-            input.removeClass('is-invalid');
+            $(this).removeClass('is-invalid');
         } else {
             validIcon.hide();
-            input.addClass('is-invalid');
+            $(this).addClass('is-invalid');
         }
     });
 
@@ -259,6 +307,18 @@ $(document).ready(function() {
             validIcon.hide();
             input.addClass('is-invalid');
         }
+    });
+
+    // Prevent form from submitting directly
+    $('#pengajuanForm').on('submit', function(e) {
+        e.preventDefault();
+        $('#confirmModal').modal('show');
+    });
+
+    // Handle confirmation
+    $('#confirmSubmit').on('click', function() {
+        $('#confirmModal').modal('hide');
+        $('#pengajuanForm')[0].submit();
     });
 
 </script>

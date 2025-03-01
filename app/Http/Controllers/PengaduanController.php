@@ -30,7 +30,7 @@ class PengaduanController extends Controller
             'jenis_id' =>'required|exists:jenis_pengaduans,id', //|exists:jenis_pengaduans,id
             'deskripsi' => 'required|max:255',
             'file' => 'file|mimes:pdf|max:1024',
-            'no_telp' => 'required|digits_between:10,15',
+            'no_telp' => 'required|digits_between:8,13',
         ],[
             'nama.required' => 'Nama harus diisi.',
             'nama.max' => 'Nama tidak boleh lebih dari 255 karakter.',
@@ -74,7 +74,7 @@ class PengaduanController extends Controller
         'jenis_id' =>'required', //|exists:jenis_pengaduans,id
         'deskripsi' => 'required|max:255',
         'file' => 'required|file|mimes:pdf|max:1024',
-        'no_telp' => 'required|digits_between:10,15',
+        'no_telp' => 'required|digits_between:8,11',
     ]);
 
     // Jika ada file baru yang diunggah

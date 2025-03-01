@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <style>
     .is-invalid {
@@ -20,11 +21,11 @@
 
 @section('container')
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h2>Ajukan Pengaduan</h2>
+    <h2>Layanan Pengaduan</h2>
 </div>
 
 <div class="col-lg-7">
-    <form method="post" action="/dashboard/pengaduan/store" 
+    <form id="pengaduanForm" method="post" action="/dashboard/pengaduan/store" 
     enctype="multipart/form-data" class="mb-5">
         @csrf
 
@@ -45,7 +46,7 @@
             <label for="no_telp" class="form-label @error('no_telp') is-invalid @enderror">
                 Nomor Telepon PIC
                 <small class="form-text text-muted d-block">
-                Masukkan Whatsapp Aktif!
+                Masukkan Whatsapp Aktif! Contoh: 085877261287
                 </small> 
             </label>
             <div class="d-flex align-items-center">
@@ -79,6 +80,9 @@
 
         <div class="mb-3">
             <label for="file" class="form-label @error('file') is-invalid @enderror">Dokumen Pengaduan</label>
+            <small class="form-text text-muted d-block">
+                Maksimal ukuran file 10MB. Format file: PDF
+            </small>
             <div class="d-flex align-items-center">
                 <input class="form-control" type="file" id="file" name="file" value="{{ old('file') }}" accept=".pdf">
                 <span class="valid-icon" id="valid-file" style="display: none;"><i class="fas fa-check" style="color: green;"></i></span>
@@ -114,37 +118,74 @@
 
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
+    <!-- Confirmation Modal with Terms and Conditions -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Konfirmasi Pengajuan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="fw-bold">Apakah Anda yakin ingin mengajukan permohonan ini?</p>
+                    
+                    <div class="mt-3">
+                        <h6>Syarat dan Ketentuan</h6>
+                        <div style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px;">
+                            <!-- Isi terms and conditions -->
+                            @include('dashboard.layouts.terms_condition')
+                        </div>
+                        <!-- <p class="mt-2 text-muted small">Dengan menekan tombol "Ya, Ajukan", Anda menyetujui syarat dan ketentuan di atas.</p> -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" id="confirmSubmit">Ya, Ajukan</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
 $(document).ready(function() {
     // Validasi Nama
     $('#nama').on('input', function() {
-        const input = $(this);
+        const value = $(this).val();
         const validIcon = $('#valid-nama');
-        const regex = /^[a-zA-Z\s]+$/;
+        const regex = /^[\p{L} ]+$/u;
         
-        if (input.val().length > 0 && regex.test(input.val())) {
+        // Remove any non-letter characters (except spaces)
+        if (!regex.test(value)) {
+            $(this).val(value.replace(/[^A-Za-z\s]/g, ''));
+        }
+
+        if (value.length > 0 && value.length <= 255 && regex.test(value)) {
             validIcon.show();
-            input.removeClass('is-invalid');
+            $(this).removeClass('is-invalid');
         } else {
             validIcon.hide();
-            input.addClass('is-invalid');
+            $(this).addClass('is-invalid');
         }
     });
 
     // Validasi Nomor Telepon
     $('#no_telp').on('input', function() {
-        const input = $(this);
+        const value = $(this).val();
         const validIcon = $('#valid-no_telp');
-        const regex = /^08\d{10,15}$/; // Format nomor Indonesia
+        const regex = /^08\d{8,12}$/; // Format nomor Indonesia
         
-        if (input.val().length > 0 && regex.test(input.val())) {
+        // allow only numbers and when it comes to char, it will disseapear
+        if (!regex.test(value)) {
+            $(this).val(value.replace(/[^\d]/g, '').substring(0, 15));
+        }
+        
+        if (/^08\d{8,12}$/.test(value)) {
             validIcon.show();
-            input.removeClass('is-invalid');
+            $(this).removeClass('is-invalid');
         } else {
             validIcon.hide();
-            input.addClass('is-invalid');
+            $(this).addClass('is-invalid');
         }
     });
 
@@ -195,6 +236,18 @@ $(document).ready(function() {
             validIcon.hide();
             input.addClass('is-invalid');
         }
+    });
+
+    // Replace the existing submit handler code with:
+    $('#pengaduanForm').on('submit', function(e) {
+        e.preventDefault();
+        $('#confirmModal').modal('show');
+    });
+
+    // Handle confirmation
+    $('#confirmSubmit').on('click', function() {
+        $('#confirmModal').modal('hide');
+        $('#pengaduanForm')[0].submit();
     });
 });
 </script>

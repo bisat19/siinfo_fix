@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <style>
     .is-invalid {
@@ -16,16 +17,20 @@
         color: green;
         margin-left: 5px;
     }
+    /* .required::after {
+        content: " *";
+        color: red;
+    } */
 </style>
 
 @section('container')
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h2>Ajukan Permohonan Subdomain & VPS</h2>
+    <h2>Form Layanan Subdomain & VPS</h2>
 </div>
 
 <div class="col-lg-7">
     <form method="post" action="/dashboard/domain/store" 
-    enctype="multipart/form-data" class="mb-5">
+    enctype="multipart/form-data" class="mb-5" id="domainForm"> 
         @csrf
         <div class="mb-3">
             <h6>Data Diri</h6>
@@ -33,6 +38,9 @@
 
         <div class="mb-3">
             <label for="nip" class="form-label @error('nip') is-invalid @enderror">NIP</label>
+            <small class="form-text text-muted d-block">
+                    Contoh: 199407232022081001
+            </small>
             <div class="d-flex align-items-center">
                 <input type="text" class="form-control" id="nip" name="nip" value="{{ old('nip') }}">
                 <span class="valid-icon" id="valid-nip" style="display: none;"><i class="fas fa-check" style="color: green;"></i></span>
@@ -84,7 +92,7 @@
         </div>
 
         <div class="mb-3">
-            <label for="email" class="form-label @error('email') is-invalid @enderror">Email
+            <label for="email" class="form-label @error('email') is-invalid @enderror">Email</span>
                 <small class="form-text text-muted d-block"> Masukkan Email Aktif! Contoh: nama@semarangkota.go.id</small>
             </label>
             <div class="d-flex align-items-center">
@@ -100,9 +108,9 @@
 
         <div class="mb-3">
             <label for="no_telp" class="form-label @error('no_telp') is-invalid @enderror">
-                Nomor Telepon PIC
+                Nomor Telepon PIC</span>
                 <small class="form-text text-muted d-block">
-                Masukkan Whatsapp Aktif!
+                Masukkan Whatsapp Aktif! Contoh: 085877261287
                 </small> 
             </label>
             <div class="d-flex align-items-center">
@@ -140,7 +148,7 @@
 
         <div class="mb-3">
             <label for="nama_domain" class="form-label @error('nama_domain') is-invalid @enderror">
-                Usulan Nama Domain
+                Usulan Nama Domain</span>
                 <small class="form-text text-muted d-block">
                     nama.semarangkota.go.id
                 </small> 
@@ -159,8 +167,12 @@
         <div class="mb-3">
             <label for="fungsi_app" class="form-label">Fungsi Aplikasi</label>
             <div class="d-flex align-items-center">
-                <textarea name="fungsi_app" id="fungsi_app" rows="5" placeholder="Masukkan fungsi aplikasi" class="form-control @error('fungsi_app') is-invalid @enderror">{{ old('fungsi_app') }}</textarea>
-                <span class="valid-icon" id="valid-fungsi_app" style="display: none;"><i class="fas fa-check" style="color: green;"></i></span>
+            <textarea class="form-control @error('fungsi_app') is-invalid @enderror" 
+                  name="fungsi_app" 
+                  id="fungsi_app" 
+                  rows="5" 
+                  placeholder="Masukkan fungsi aplikasi">{{ old('fungsi_app') }}</textarea>
+            <span class="valid-icon" id="valid-fungsi_app" style="display: none;"><i class="fas fa-check" style="color: green;"></i></span>
             </div>
             @error('fungsi_app')
             <div class="invalid-feedback d-block">
@@ -193,7 +205,7 @@
         <div class="mb-3">
             <label for="dokumen" class="form-label @error('dokumen') is-invalid @enderror">
                 Data Dukung
-                <small class="form-text text-muted d-block">Surat permohonan yang ditandatangani oleh kepala bidang terkait</small> 
+                <small class="form-text text-muted d-block">Surat permohonan yang ditandatangani oleh kepala bidang terkait. Maksimal ukuran file 10MB. Format file: PDF</small> 
             </label>
             <div class="d-flex align-items-center">
                 <input class="form-control" type="file" id="dokumen" name="dokumen" value="{{ old('dokumen') }}" accept=".pdf">
@@ -206,8 +218,39 @@
             @enderror
         </div>
 
+        <!-- <div class="mt-2 mb-3">
+            <small class="text-muted"><span class="text-danger">*</span> Field wajib diisi</small>
+        </div> -->
+
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
+    <!-- Confirmation Modal with Terms and Conditions -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Konfirmasi Pengajuan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="fw-bold">Apakah Anda yakin ingin mengajukan permohonan ini?</p>
+                    
+                    <div class="mt-3">
+                        <h6>Syarat dan Ketentuan</h6>
+                        <div style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px;">
+                            <!-- Isi terms and conditions -->
+                            @include('dashboard.layouts.terms_condition')
+                        </div>
+                        <!-- <p class="mt-2 text-muted small">Dengan menekan tombol "Ya, Ajukan", Anda menyetujui syarat dan ketentuan di atas.</p> -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" id="confirmSubmit">Ya, Ajukan</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -216,7 +259,13 @@ $(document).ready(function() {
     $('#nip').on('input', function() {
         const validIcon = $('#valid-nip');
         const value = $(this).val();
-        
+        const regex = /^\d{0,18}$/;  // Allow only numbers up to 18 digits
+    
+        // allow only numbers and when it comes to char, it will disseapear
+        if (!regex.test(value)) {
+            $(this).val(value.replace(/[^\d]/g, '').substring(0, 18));
+        }
+
         if (/^\d{18}$/.test(value)) {
             validIcon.show();
             $(this).removeClass('is-invalid');
@@ -232,6 +281,11 @@ $(document).ready(function() {
         const regex = /^[\p{L} ]+$/u;
         const value = $(this).val();
         
+        // Remove any non-letter characters (except spaces)
+        if (!regex.test(value)) {
+            $(this).val(value.replace(/[^A-Za-z\s]/g, ''));
+        }
+
         if (value.length > 0 && value.length <= 255 && regex.test(value)) {
             validIcon.show();
             $(this).removeClass('is-invalid');
@@ -246,6 +300,11 @@ $(document).ready(function() {
         const validIcon = $('#valid-jabatan');
         const value = $(this).val();
         
+        // Remove any non-letter characters (except spaces)
+        if (!regex.test(value)) {
+            $(this).val(value.replace(/[^A-Za-z\s]/g, ''));
+        }
+        
         if (value.length > 0 && value.length <= 255) {
             validIcon.show();
             $(this).removeClass('is-invalid');
@@ -259,7 +318,12 @@ $(document).ready(function() {
     $('#opd').on('input', function() {
         const validIcon = $('#valid-opd');
         const value = $(this).val();
-        
+
+        // Remove any non-letter characters (except spaces)
+        if (!regex.test(value)) {
+            $(this).val(value.replace(/[^A-Za-z\s]/g, ''));
+        }        
+
         if (value.length > 0 && value.length <= 255) {
             validIcon.show();
             $(this).removeClass('is-invalid');
@@ -288,6 +352,12 @@ $(document).ready(function() {
     $('#no_telp').on('input', function() {
         const validIcon = $('#valid-no_telp');
         const value = $(this).val();
+        const regex = /^\d{0,15}$/;
+
+        // allow only numbers and when it comes to char, it will disseapear
+        if (!regex.test(value)) {
+            $(this).val(value.replace(/[^\d]/g, '').substring(0, 15));
+        }
         
         if (/^\d{10,15}$/.test(value)) {
             validIcon.show();
@@ -368,6 +438,18 @@ $(document).ready(function() {
             validIcon.hide();
             $(this).addClass('is-invalid');
         }
+    });
+
+    // Prevent form from submitting directly
+    $('#domainForm').on('submit', function(e) {
+        e.preventDefault();
+        $('#confirmModal').modal('show');
+    });
+
+    // Handle confirmation
+    $('#confirmSubmit').on('click', function() {
+        $('#confirmModal').modal('hide');
+        $('#domainForm')[0].submit();
     });
 });
 </script>
